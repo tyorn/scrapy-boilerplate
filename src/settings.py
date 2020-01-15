@@ -10,7 +10,7 @@ load_dotenv()
 
 BOT_NAME = "YOUR_PROJECT_NAME"
 
-SPIDER_MODULES = ["spiders"]
+SPIDER_MODULES = ["spiders", "spiders.test"]
 NEWSPIDER_MODULE = "spiders"
 COMMANDS_MODULE = "commands"
 
