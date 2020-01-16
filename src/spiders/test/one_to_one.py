@@ -2,6 +2,8 @@ from datetime import datetime
 
 import scrapy
 
+from helpers import RMQObject
+
 
 class OneToOneTestSpider(scrapy.Spider):
     name = 'one-one-test'
@@ -21,7 +23,7 @@ class OneToOneTestSpider(scrapy.Spider):
         self.rmq_settings['queue'] = 'test_queue'
         self.rmq_settings['create_request_callback'] = self.__create_request
 
-    def __create_request(self, message: dict, rmq_object):
+    def __create_request(self, message: dict, rmq_object: RMQObject):
         return scrapy.Request(
             url=message['url'],
             callback=self.parse,
@@ -37,3 +39,6 @@ class OneToOneTestSpider(scrapy.Spider):
             'ip': response.css('#ip::text').get().strip(),
             'datetime': datetime.now(),
         }
+
+        # this line will execute after item_error or item_dropped listeners callback complete
+        response.meta['rmq_object'].ack()
