@@ -1,5 +1,4 @@
 import json
-from datetime import datetime
 
 import pika
 
@@ -18,13 +17,10 @@ class PikaTestPipeline:
         spider.logger.info(f'Init prisoner publisher with queue: {self.connection.queue_name}')
 
     def process_item(self, item, spider):
-        data = dict(item)
-        data['datetime'] = datetime.now()
-
         self.connection.rabbit_channel.basic_publish(
             exchange='',
             routing_key=self.connection.queue_name,
-            body=json.dumps(dict(data), default=str),
+            body=json.dumps(dict(item), default=str),
             properties=pika.BasicProperties(
                 delivery_mode=2,  # make message persistent
             ),

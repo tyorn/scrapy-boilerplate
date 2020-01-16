@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import scrapy
 
 
@@ -32,5 +34,6 @@ class OneToOneTestSpider(scrapy.Spider):
 
     def parse(self, response):
         yield {
-            'ip': response.css('#ip::text').get().strip()
+            'ip': response.css('#ip::text').get().strip(),
+            'datetime': datetime.now(),
         }
