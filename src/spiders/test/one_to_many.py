@@ -2,8 +2,6 @@ from datetime import datetime
 
 import scrapy
 
-from helpers import RMQObject
-
 
 class OneToManyTestSpider(scrapy.Spider):
     name = 'one-many-test'
@@ -14,6 +12,9 @@ class OneToManyTestSpider(scrapy.Spider):
         },
         'ITEM_PIPELINES': {
             'pipelines.pika_test_pipeline.PikaTestPipeline': 500,
+        },
+        'SPIDER_MIDDLEWARES': {
+            'spidermiddlewares.AddRMQObjectToRequestMiddleware': 500,
         }
     }
 
@@ -24,14 +25,11 @@ class OneToManyTestSpider(scrapy.Spider):
             'create_request_callback': self.__create_request
         })
 
-    def __create_request(self, message: dict, rmq_object: RMQObject):
+    def __create_request(self, message: dict):
         return scrapy.Request(
             url=message['url'],
             callback=self.parse,
             errback=self.parse,
-            meta={
-                'rmq_object': rmq_object
-            },
             dont_filter=True,
         )
 
@@ -45,14 +43,11 @@ class OneToManyTestSpider(scrapy.Spider):
 
         retry = response.meta.get('retry', 0)
         if retry < 2:
-            meta = response.meta
-            meta.update({'retry': retry + 1})
             yield scrapy.Request(
                 response.url,
                 self.parse,
                 dont_filter=True,
-                meta=meta
+                meta={'retry': retry + 1}
             )
         else:
             response.meta['rmq_object'].ack()
-

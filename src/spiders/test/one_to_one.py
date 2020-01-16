@@ -2,8 +2,6 @@ from datetime import datetime
 
 import scrapy
 
-from helpers import RMQObject
-
 
 class OneToOneTestSpider(scrapy.Spider):
     name = 'one-one-test'
@@ -14,6 +12,9 @@ class OneToOneTestSpider(scrapy.Spider):
         },
         'ITEM_PIPELINES': {
             'pipelines.pika_test_pipeline.PikaTestPipeline': 500,
+        },
+        'SPIDER_MIDDLEWARES': {
+            'spidermiddlewares.AddRMQObjectToRequestMiddleware': 500,
         }
     }
 
@@ -24,14 +25,11 @@ class OneToOneTestSpider(scrapy.Spider):
             'create_request_callback': self.__create_request
         })
 
-    def __create_request(self, message: dict, rmq_object: RMQObject):
+    def __create_request(self, message: dict):
         return scrapy.Request(
             url=message['url'],
             callback=self.parse,
             errback=self.parse,
-            meta={
-                'rmq_object': rmq_object
-            },
             dont_filter=True,
         )
 
