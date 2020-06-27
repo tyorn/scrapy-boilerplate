@@ -2,9 +2,9 @@
 import logging
 import os
 from distutils.util import strtobool
+from typing import Dict
 
 from dotenv import load_dotenv
-
 
 load_dotenv()
 
@@ -16,7 +16,7 @@ COMMANDS_MODULE = "commands"
 
 PROXY = os.getenv("PROXY", "")
 PROXY_AUTH = os.getenv("PROXY_AUTH", "")
-PROXY_ENABLED = os.getenv("PROXY_ENABLED", False)
+PROXY_ENABLED = strtobool(os.getenv("PROXY_ENABLED", "False"))
 
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36"
 
@@ -40,13 +40,12 @@ DEFAULT_REQUEST_HEADERS = {
 DOWNLOADER_MIDDLEWARES = {
     "scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware": None,
     "middlewares.HttpProxyMiddleware": 543,
-    "middlewares.LogErrorsMiddleware": 550,
 }
 
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 LOG_FILE = os.getenv("LOG_FILE") if os.getenv("LOG_FILE", "") else None
 
-ITEM_PIPELINES = {}
+ITEM_PIPELINES: Dict[str, int] = {}
 
 MYSQL_USER = os.getenv("MYSQL_USER", "127.0.0.1")
 MYSQL_PASS = os.getenv("MYSQL_PASS", "")
